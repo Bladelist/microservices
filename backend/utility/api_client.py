@@ -18,23 +18,27 @@ class DiscordAPIClient:
 
     async def get(self, endpoint):
         async with self.session as session:
-            resp = await session.get(url+endpoint)
-            return resp.json()
+            try:
+                resp = await session.get(url+endpoint)
+                return resp.json()
+            except httpx.ConnectTimeout:
+                return
+            except httpx.TimeoutException:
+                return
+            finally:
+                await self.close()
 
     async def post(self, endpoint, data):
         async with self.session as session:
-            resp = await session.post(url+endpoint, data=data)
-            return resp.json()
-
-    async def patch(self, endpoint, data):
-        async with self.session as session:
-            resp = await session.patch(url+endpoint, data=json.dumps(data))
-            return resp.json()
-
-    async def delete(self, endpoint):
-        async with self.session as session:
-            resp = await session.delete(url+endpoint)
-            return resp.json()
+            try:
+                resp = await session.post(url+endpoint, data=data)
+                return resp.json()
+            except httpx.ConnectTimeout:
+                return
+            except httpx.TimeoutException:
+                return
+            finally:
+                await self.close()
 
     async def refresh_access_token(self, refresh_token):
         payload = {
