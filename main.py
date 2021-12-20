@@ -1,5 +1,6 @@
 
 import asyncio
+import aioredis
 from uvicorn.main import run
 from tortoise.contrib.starlette import register_tortoise
 
@@ -12,6 +13,7 @@ config = Config('.env')
 DEBUG = config('DEBUG', cast=bool, default=False)
 host = "0.0.0.0"
 port = 8000
+redis_conn = None
 if DEBUG:
     host = "127.0.0.1"
     port = 7000
@@ -25,10 +27,16 @@ register_tortoise(
 )
 
 
+@app.on_event('startup')
+async def startup():
+    global redis_conn
+    redis_conn = await aioredis.from_url(url=config("REDIS_URI"), username="default", password=config("REDIS_PASSWORD"))
+
+
 @app.on_event("startup")
 async def run_tasks():
     loop = asyncio.get_event_loop()
-    loop.create_task(bot_avatar_updation_service())
+    loop.create_task(bot_avatar_updation_service(redis_conn))
 
 if __name__ == "__main__":
     run("main:app", reload=True, host=host, port=port, forwarded_allow_ips='*', proxy_headers=True)
