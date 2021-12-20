@@ -1,12 +1,27 @@
 import asyncio
+from datetime import datetime, timezone
+from starlette.config import Config
+
 from backend.models import Bot
+from backend.utility.api_client import DiscordAPIClient
 
 
-async def bot_avatar_updation_service():
+config = Config(".env")
+api = DiscordAPIClient(authorization=f"Bot {config('BOT_TOKEN')}")
+
+
+async def bot_avatar_updation_service(redis_conn):
+
     while True:
-        bots = await Bot.all()
-        for bot in bots:
-            print(
-                bot.avatar
-            )
-        await asyncio.sleep(1900)
+        now = datetime.now(timezone.utc)
+        last_bot_updation = await redis_conn.get("BOT_AVATAR_UPDATION")
+        last_updation_time = datetime.fromisoformat(last_bot_updation.decode('utf-8'))
+        if (now - last_updation_time).total_seconds() > 43200:
+            bots = await Bot.all()
+            for bot in bots:
+                bot_json = await api.get_bot_info(bot.id)
+                if bot.avatar != bot_json.get("avatar"):
+                    bot.avatar = bot_json.get("avatar")
+                    await bot.save()
+                await asyncio.sleep(5)
+        await asyncio.sleep(3600)
