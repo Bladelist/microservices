@@ -1,4 +1,3 @@
-import json
 import httpx
 from starlette.config import Config
 
@@ -32,6 +31,7 @@ class DiscordAPIClient:
         async with self.session as session:
             try:
                 resp = await session.post(url+endpoint, data=data)
+                if resp.status == 
                 return resp.json()
             except httpx.ConnectTimeout:
                 return

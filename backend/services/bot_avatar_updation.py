@@ -14,14 +14,12 @@ async def bot_avatar_updation_service(redis_conn):
     while True:
         now = datetime.now(timezone.utc)
         last_bot_updation = await redis_conn.get("BOT_AVATAR_UPDATION")
-        await redis_conn.set("BOT_AVATAR_UPDATION", str(now-timedelta(days=1)))
         last_updation_time = datetime.fromisoformat(last_bot_updation.decode('utf-8'))
         if (now - last_updation_time).total_seconds() > 43200:
             bots = await Bot.all()
             for bot in bots:
                 bot_json = await api.get_bot_info(bot.id)
                 if bot_json:
-                    print(bot_json)
                     if bot.avatar != bot_json.get("avatar"):
                         bot.avatar = bot_json.get("avatar")
                         await bot.save()

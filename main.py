@@ -37,7 +37,7 @@ async def startup():
 async def run_tasks():
     loop = asyncio.get_event_loop()
     loop.create_task(bot_avatar_updation_service(redis_conn))
-    # loop.create_task(guild_icon_updation_service(redis_conn))
+    loop.create_task(guild_icon_updation_service(redis_conn))
 
 
 if __name__ == "__main__":
