@@ -19,9 +19,10 @@ async def guild_icon_updation_service(redis_conn):
             guilds = await Server.all()
             for guild in guilds:
                 guild_json = await api.get_guild_info(guild.id)
-                if guild.icon != guild_json.get("icon"):
-                    guild.icon = guild_json.get("icon")
-                    await guild.save()
+                if guild_json.get("icon"):
+                    if guild.icon != guild_json.get("icon"):
+                        guild.icon = guild_json.get("icon")
+                        await guild.save()
                 await asyncio.sleep(5)
             await redis_conn.set("GUILD_ICON_UPDATION", str(now))
         await asyncio.sleep(3600)

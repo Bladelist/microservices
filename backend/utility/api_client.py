@@ -31,8 +31,8 @@ class DiscordAPIClient:
         async with self.session as session:
             try:
                 resp = await session.post(url+endpoint, data=data)
-                if resp.status == 
-                return resp.json()
+                if resp.status == 201:
+                    return resp.json()
             except httpx.ConnectTimeout:
                 return
             except httpx.TimeoutException:
