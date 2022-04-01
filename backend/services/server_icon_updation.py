@@ -15,7 +15,7 @@ async def guild_icon_updation_service(redis_conn):
         now = datetime.now(timezone.utc)
         last_guild_updation = await redis_conn.get("GUILD_ICON_UPDATION")
         last_updation_time = datetime.fromisoformat(last_guild_updation.decode('utf-8'))
-        if (now - last_updation_time).total_seconds() > 43200:
+        if (now - last_updation_time).total_seconds() > 86400:
             guilds = await Server.all()
             for guild in guilds:
                 guild_json = await api.get_guild_info(guild.id)
