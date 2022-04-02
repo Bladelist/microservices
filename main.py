@@ -6,6 +6,7 @@ from tortoise.contrib.starlette import register_tortoise
 
 from starlette.applications import Starlette
 from starlette.config import Config
+from starlette.routing import Route
 from backend.services.bot_avatar_updation import bot_avatar_updation_service
 from backend.services.server_icon_updation import guild_icon_updation_service
 
@@ -18,7 +19,15 @@ if DEBUG:
     host = "127.0.0.1"
     port = 7000
 
-app = Starlette(debug=DEBUG)
+
+async def ping(request):
+    return JSONResponse({'status': 'running'})
+
+
+app = Starlette(debug=DEBUG, routes=[
+    Route('/', ping),
+])
+
 register_tortoise(
     app,
     db_url=config("DB_URI"),
