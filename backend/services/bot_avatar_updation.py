@@ -24,9 +24,6 @@ async def bot_avatar_updation_service(redis_conn):
                         if bot.avatar != bot_json.get("avatar"):
                             bot.avatar = bot_json.get("avatar")
                             await bot.save()
-                    else:
-                        if "Deleted User" in bot_json.get("username"):
-                            await bot.delete()
                 await asyncio.sleep(5)
             await redis_conn.set("BOT_AVATAR_UPDATION", str(now))
         await asyncio.sleep(3600)
