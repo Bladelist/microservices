@@ -27,3 +27,7 @@ async def bot_avatar_updation_service(redis_conn):
                 await asyncio.sleep(5)
             await redis_conn.set("BOT_AVATAR_UPDATION", str(now))
         await asyncio.sleep(3600)
+
+
+async def get_bot_info(id):
+    return await api.get_bot_info(bot_id=id)

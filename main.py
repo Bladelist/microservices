@@ -7,7 +7,8 @@ from tortoise.contrib.starlette import register_tortoise
 from starlette.applications import Starlette
 from starlette.config import Config
 from starlette.routing import Route
-from backend.services.bot_avatar_updation import bot_avatar_updation_service
+from starlette.responses import JSONResponse
+from backend.services.bot_avatar_updation import bot_avatar_updation_service, get_bot_info
 from backend.services.server_icon_updation import guild_icon_updation_service
 
 config = Config('.env')
@@ -24,8 +25,13 @@ async def ping(request):
     return JSONResponse({'status': 'running'})
 
 
+async def bot_info(request):
+    bot_json = await get_bot_info(request.path_params['id'])
+    return JSONResponse(bot_json)
+
 app = Starlette(debug=DEBUG, routes=[
     Route('/', ping),
+    Route('/bot/{id:int}', bot_info)
 ])
 
 register_tortoise(
